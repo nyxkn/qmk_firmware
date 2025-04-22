@@ -20,6 +20,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "action_layer.h"
+#include "process_tap_dance.h"
+#include "quantum.h"
+
 #include QMK_KEYBOARD_H
 
 #ifdef RAW_ENABLE
@@ -51,9 +56,9 @@ enum layers {
 };
 
 // custom keycodes
-enum my_keycodes {
-    LAYER_LOCK = SAFE_RANGE,
-};
+/* enum my_keycodes { */
+/*     LAYER_LOCK = SAFE_RANGE, */
+/* }; */
 
 // save space
 #ifndef MAGIC_ENABLE
@@ -140,7 +145,7 @@ typedef struct {
     td_status_t state;
 } td_tap_t;
 
-td_status_t cur_dance(qk_tap_dance_state_t *state);
+td_status_t cur_dance(tap_dance_state_t *state);
 
 /* Return an integer that corresponds to what kind of tap dance should be executed.
  *
@@ -169,7 +174,7 @@ td_status_t cur_dance(qk_tap_dance_state_t *state);
  * For the third point, there does exist the 'TD_DOUBLE_SINGLE_TAP', however this is not fully tested
  *
  */
-td_status_t cur_dance(qk_tap_dance_state_t *state) {
+td_status_t cur_dance(tap_dance_state_t *state) {
     if (state->count == 1) {
         if (state->interrupted || !state->pressed) return TD_SINGLE_TAP;
         // Key has not been interrupted, but the key is still held. Means you want to send a 'HOLD'.
@@ -201,7 +206,7 @@ td_status_t cur_dance(qk_tap_dance_state_t *state) {
 
 // Simplified version with only single/double tap and hold
 // for debugging, but actually this is all we need anyway
-/* td_status_t cur_dance(qk_tap_dance_state_t *state) { */
+/* td_status_t cur_dance(tap_dance_state_t *state) { */
 /*     if (state->count == 1) { */
 /*         if (state->interrupted || !state->pressed) return TD_SINGLE_TAP; */
 /*         else return TD_SINGLE_HOLD; */
@@ -212,7 +217,7 @@ td_status_t cur_dance(qk_tap_dance_state_t *state) {
 /* } */
 
 // fast dance version. tap is triggered by user process on key release instead of waiting until term expire
-td_status_t fast_dance_status(qk_tap_dance_state_t *state) {
+td_status_t fast_dance_status(tap_dance_state_t *state) {
     // dance finished - term expired or key interrupted - key being held
     // single tap has already been handled by user process, and reset will be called skipping finished
     if (state->pressed) {
@@ -239,7 +244,7 @@ typedef struct {
     /* bool is_press_action; */
     td_status_t status;
     uint16_t    tap_kc;
-    /* qk_tap_dance_state_t state; */
+    /* tap_dance_state_t state; */
 } td_user_data_t;
 
 #define ACTION_TAP_DANCE_FN_ADVANCED_NYX(user_fn_on_each_tap, user_fn_on_dance_finished, user_fn_on_dance_reset, tap_kc) \
@@ -257,7 +262,7 @@ typedef struct {
     uint16_t held;
 } tap_dance_tap_hold_t;
 
-void tap_dance_tap_hold_finished(qk_tap_dance_state_t *state, void *user_data) {
+void tap_dance_tap_hold_finished(tap_dance_state_t *state, void *user_data) {
     tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
 
     if (state->pressed) {
@@ -275,7 +280,7 @@ void tap_dance_tap_hold_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void tap_dance_tap_hold_reset(qk_tap_dance_state_t *state, void *user_data) {
+void tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
     tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
 
     if (tap_hold->held) {
@@ -309,28 +314,28 @@ enum {
 };
 
 // declaring here is optional, but makes it so that we have a nice overview of things in here
-/* void td_tl3_finished(qk_tap_dance_state_t *state, void *user_data); */
-/* void td_tl3_reset(qk_tap_dance_state_t *state, void *user_data); */
+/* void td_tl3_finished(tap_dance_state_t *state, void *user_data); */
+/* void td_tl3_reset(tap_dance_state_t *state, void *user_data); */
 /* static td_status_t td_tl3_state; */
 
-/* void td_tr2_finished(qk_tap_dance_state_t *state, void *user_data); */
-/* void td_tr2_reset(qk_tap_dance_state_t *state, void *user_data); */
+/* void td_tr2_finished(tap_dance_state_t *state, void *user_data); */
+/* void td_tr2_reset(tap_dance_state_t *state, void *user_data); */
 /* static td_status_t td_tr2_state; */
 
-void td_tl3_finished(qk_tap_dance_state_t *state, void *user_data);
-void td_tl3_reset(qk_tap_dance_state_t *state, void *user_data);
+void td_tl3_finished(tap_dance_state_t *state, void *user_data);
+void td_tl3_reset(tap_dance_state_t *state, void *user_data);
 
-void td_tl2_finished(qk_tap_dance_state_t *state, void *user_data);
-void td_tl2_reset(qk_tap_dance_state_t *state, void *user_data);
+void td_tl2_finished(tap_dance_state_t *state, void *user_data);
+void td_tl2_reset(tap_dance_state_t *state, void *user_data);
 
-void td_tr2_finished(qk_tap_dance_state_t *state, void *user_data);
-void td_tr2_reset(qk_tap_dance_state_t *state, void *user_data);
+void td_tr2_finished(tap_dance_state_t *state, void *user_data);
+void td_tr2_reset(tap_dance_state_t *state, void *user_data);
 
-void td_tr3_finished(qk_tap_dance_state_t *state, void *user_data);
-void td_tr3_reset(qk_tap_dance_state_t *state, void *user_data);
+void td_tr3_finished(tap_dance_state_t *state, void *user_data);
+void td_tr3_reset(tap_dance_state_t *state, void *user_data);
 
 // if you don't declare functions above, you have to move this down below the functions
-qk_tap_dance_action_t tap_dance_actions[] = {
+tap_dance_action_t tap_dance_actions[] = {
     /* [TD_TL3] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_tl3_finished, td_tl3_reset), */
     /* [TD_TR2] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_tr2_finished, td_tr2_reset), */
     /* [CT_CLN] = ACTION_TAP_DANCE_TAP_HOLD(KC_COLN, KC_SCLN), */
@@ -343,7 +348,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 
 // ================================================================================
 
-/* void td_tl3_finished(qk_tap_dance_state_t *state, void *user_data) { */
+/* void td_tl3_finished(tap_dance_state_t *state, void *user_data) { */
 /*     td_tl3_state = cur_dance(state); */
 /*     switch (td_tl3_state) { */
 /*         case TD_SINGLE_TAP: */
@@ -361,7 +366,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 /*     } */
 /* } */
 
-/* void td_tl3_reset(qk_tap_dance_state_t *state, void *user_data) { */
+/* void td_tl3_reset(tap_dance_state_t *state, void *user_data) { */
 /*     switch (td_tl3_state) { */
 /*         case TD_SINGLE_TAP: */
 /*             /\* clear_oneshot_layer_state(ONESHOT_PRESSED); *\/ */
@@ -379,7 +384,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 
 // ================================================================================
 
-/* void td_tr2_finished(qk_tap_dance_state_t *state, void *user_data) { */
+/* void td_tr2_finished(tap_dance_state_t *state, void *user_data) { */
 /*     td_tr2_state = cur_dance(state); */
 /*     switch (td_tr2_state) { */
 /*         case TD_SINGLE_TAP: */
@@ -396,7 +401,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 /*     } */
 /* } */
 
-/* void td_tr2_reset(qk_tap_dance_state_t *state, void *user_data) { */
+/* void td_tr2_reset(tap_dance_state_t *state, void *user_data) { */
 /*     switch (td_tr2_state) { */
 /*         case TD_SINGLE_TAP: */
 /*             clear_oneshot_layer_state(ONESHOT_PRESSED); */
@@ -416,7 +421,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 
 // tap is necessarily a basic keycode
 // hold can be a keycode, a layer activation, or a modifier hold
-void td_tl3_finished(qk_tap_dance_state_t *state, void *user_data) {
+void td_tl3_finished(tap_dance_state_t *state, void *user_data) {
     td_user_data_t *td_user_data = (td_user_data_t *)user_data;
     td_user_data->status         = fast_dance_status(state);
 
@@ -429,7 +434,7 @@ void td_tl3_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void td_tl3_reset(qk_tap_dance_state_t *state, void *user_data) {
+void td_tl3_reset(tap_dance_state_t *state, void *user_data) {
     td_user_data_t *td_user_data = (td_user_data_t *)user_data;
 
     switch (td_user_data->status) {
@@ -447,7 +452,7 @@ void td_tl3_reset(qk_tap_dance_state_t *state, void *user_data) {
 
 // ================================================================================
 
-void td_tl2_finished(qk_tap_dance_state_t *state, void *user_data) {
+void td_tl2_finished(tap_dance_state_t *state, void *user_data) {
     td_user_data_t *td_user_data = (td_user_data_t *)user_data;
     td_user_data->status         = fast_dance_status(state);
 
@@ -460,7 +465,7 @@ void td_tl2_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void td_tl2_reset(qk_tap_dance_state_t *state, void *user_data) {
+void td_tl2_reset(tap_dance_state_t *state, void *user_data) {
     td_user_data_t *td_user_data = (td_user_data_t *)user_data;
 
     switch (td_user_data->status) {
@@ -478,7 +483,7 @@ void td_tl2_reset(qk_tap_dance_state_t *state, void *user_data) {
 
 // ================================================================================
 
-void td_tr2_finished(qk_tap_dance_state_t *state, void *user_data) {
+void td_tr2_finished(tap_dance_state_t *state, void *user_data) {
     td_user_data_t *td_user_data = (td_user_data_t *)user_data;
     td_user_data->status         = fast_dance_status(state);
 
@@ -491,7 +496,7 @@ void td_tr2_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void td_tr2_reset(qk_tap_dance_state_t *state, void *user_data) {
+void td_tr2_reset(tap_dance_state_t *state, void *user_data) {
     td_user_data_t *td_user_data = (td_user_data_t *)user_data;
 
     switch (td_user_data->status) {
@@ -509,7 +514,7 @@ void td_tr2_reset(qk_tap_dance_state_t *state, void *user_data) {
 
 // ================================================================================
 
-void td_tr3_finished(qk_tap_dance_state_t *state, void *user_data) {
+void td_tr3_finished(tap_dance_state_t *state, void *user_data) {
     td_user_data_t *td_user_data = (td_user_data_t *)user_data;
     td_user_data->status         = fast_dance_status(state);
 
@@ -522,7 +527,7 @@ void td_tr3_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void td_tr3_reset(qk_tap_dance_state_t *state, void *user_data) {
+void td_tr3_reset(tap_dance_state_t *state, void *user_data) {
     td_user_data_t *td_user_data = (td_user_data_t *)user_data;
 
     switch (td_user_data->status) {
@@ -580,7 +585,7 @@ void td_tr3_reset(qk_tap_dance_state_t *state, void *user_data) {
 /* } */
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    qk_tap_dance_action_t *action;
+    tap_dance_action_t *action;
 
 #ifdef CONSOLE_ENABLE
     uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
@@ -664,7 +669,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // underscore seems to always break the caps. but we can use minus instead which we set to become shifted
 bool caps_word_press_user(uint16_t keycode) {
     /* uprintf("kc: 0x%04X \n", keycode); */
-    /* uprintf("num: 0x%04X \n", (QK_TAP_DANCE | TD_TL2)); */
+    /* uprintf("num: 0x%04X \n", (TAP_DANCE | TD_TL2)); */
 
     switch (keycode) {
         // Keycodes that continue Caps Word, with shift applied.
@@ -725,16 +730,15 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
-        // QMK Logo and version information
-        // clang-format off
-        static const char PROGMEM qmk_logo[] = {
-            0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,
-            0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,
-            0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0};
-        // clang-format on
-
-        oled_write_P(qmk_logo, false);
-        oled_write_P(PSTR("Kyria rev1.0\n\n"), false);
+        /* // QMK Logo and version information */
+        /* // clang-format off */
+        /* static const char PROGMEM qmk_logo[] = { */
+        /*     0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94, */
+        /*     0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4, */
+        /*     0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0}; */
+        /* // clang-format on */
+        /* oled_write_P(qmk_logo, false); */
+        /* oled_write_P(PSTR("Kyria rev1.0\n\n"), false); */
 
         // Host Keyboard Layer Status
         int layer_number = get_highest_layer(layer_state | default_layer_state);

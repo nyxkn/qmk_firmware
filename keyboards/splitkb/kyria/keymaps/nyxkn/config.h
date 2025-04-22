@@ -31,7 +31,57 @@
 #    define RGBLIGHT_SAT_STEP 8
 #    define RGBLIGHT_VAL_STEP 8
 #    ifndef RGBLIGHT_LIMIT_VAL
-#    	define RGBLIGHT_LIMIT_VAL 150
+#        define RGBLIGHT_LIMIT_VAL 150
 #    endif
 #endif
 
+// ========================================
+// nyxkn
+
+// space saving
+#undef LOCKING_SUPPORT_ENABLE
+#undef LOCKING_RESYNC_ENABLE
+#define NO_MUSIC_MODE
+/* #define LAYER_STATE_8BIT */
+#define LAYER_STATE_16BIT
+
+#define RGBLIGHT_SLEEP
+
+/* #define ONESHOT_TAP_TOGGLE 0 */
+/* #define TAPPING_TOGGLE 2 */
+
+// in case you pressed and forgot about it
+#define ONESHOT_TIMEOUT 5000
+
+// < tap, > hold
+/* #define TAPPING_TERM 200 */
+#define TAPPING_TERM 180
+
+// hold after tap forces hold function (replacing keyrepeat)
+/* #define TAPPING_FORCE_HOLD */
+
+// holding mod and tapping another key activates mod even if faster than tapping_term
+// requires careful typing or you'll find accidental mod activations
+/* #define PERMISSIVE_HOLD */
+
+// releasing mod without having pressed anything else sends tap keycode
+// can be problematic with mods if you want to just cancel the hold, or when using with mouse
+/* #define RETRO_TAPPING */
+
+// autoshift is problematic for hjkl holding
+#define AUTO_SHIFT_TIMEOUT 175
+
+#define NO_AUTO_SHIFT_SPECIAL
+#define NO_AUTO_SHIFT_NUMERIC
+
+// allow shifted key to be repeated
+/* #define AUTO_SHIFT_REPEAT */
+/* #define AUTO_SHIFT_NO_AUTO_REPEAT */
+
+// on a mod-tap, retro shift produces shifted version of tap keycode when released without other presses
+// if mod-tap is held longer than value, don't send tap at all (allows cancel or usage with mouse)
+// doesn't seem to work?
+#define RETRO_SHIFT
+/* #define RETRO_SHIFT 500 */
+
+#define UNICODE_SELECTED_MODES UNICODE_MODE_LINUX

@@ -334,7 +334,7 @@ tap_dance_action_t tap_dance_actions[] = {
     /* [CT_CLN] = ACTION_TAP_DANCE_TAP_HOLD(KC_COLN, KC_SCLN), */
     [TD_TL3] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tl3_finished, td_tl3_reset, KC_SPC),
     /* [TD_TL2] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tl2_finished, td_tl2_reset, RCTL(KC_BSPC)), */
-    [TD_TL2] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tl2_finished, td_tl2_reset, KC_ENTER),
+    [TD_TL2] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tl2_finished, td_tl2_reset, KC_BSPC),
     [TD_TR2] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tr2_finished, td_tr2_reset, KC_ESC),
     [TD_TR3] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tr3_finished, td_tr3_reset, KC_SPC),
 };
@@ -667,7 +667,7 @@ bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
         // Keycodes that continue Caps Word, with shift applied.
         case KC_A ... KC_Z:
-        case KC_MINS:
+            /* case KC_MINS: */
             add_weak_mods(MOD_BIT(KC_LSFT)); // Apply shift to next key.
             return true;
 
@@ -680,6 +680,7 @@ bool caps_word_press_user(uint16_t keycode) {
         case QK_TAP_DANCE | TD_TR2:
             return true;
 
+        // anything else deactivates caps word
         default:
             return false; // Deactivate Caps Word.
     }
@@ -720,7 +721,6 @@ const key_override_t *key_overrides[] = {
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_180;
 }
-
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         /* // QMK Logo and version information */
@@ -735,6 +735,7 @@ bool oled_task_user(void) {
 
         // Host Keyboard Layer Status
         int layer_number = get_highest_layer(layer_state | default_layer_state);
+
         oled_write_P(PSTR("Layer: "), false);
         switch (layer_number) {
             /* case _DEFAULT_QWERTY: */
@@ -808,6 +809,9 @@ bool oled_task_user(void) {
         oled_write_P(led_usb_state.caps_lock ? PSTR("CAP ") : PSTR("    "), false);
         oled_write_P(led_usb_state.scroll_lock ? PSTR("SCR ") : PSTR("    "), false);
     } else {
+        // our left oled seems to be dead
+        // in any case if you have to test it, make sure to flash left side as well
+
         // clang-format off
         static const char PROGMEM kyria_logo[] = {
             0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,128,128,192,224,240,112,120, 56, 60, 28, 30, 14, 14, 14,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7, 14, 14, 14, 30, 28, 60, 56,120,112,240,224,192,128,128,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,

@@ -2,8 +2,8 @@
 OLED_ENABLE = yes
 ENCODER_ENABLE = no       # Enables the use of one or more encoders
 RGB_MATRIX_ENABLE = no     # Disable keyboard RGB matrix, as it is enabled by default on rev3
-RGBLIGHT_ENABLE = yes      # Enable keyboard RGB underglow
-
+RGBLIGHT_ENABLE = no      # Enable keyboard RGB underglow
+# rgblight seems to trigger an error and oled shows exclamation marks like !!!!!!!!
 
 # save space
 LTO_ENABLE = yes
@@ -17,7 +17,7 @@ SPACE_CADET_ENABLE = no
 GRAVE_ESC_ENABLE = no
 MAGIC_ENABLE = no
 
-AVR_USE_MINIMAL_PRINTF = yes
+# AVR_USE_MINIMAL_PRINTF = yes
 
 MUSIC_ENABLE = no
 

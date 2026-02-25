@@ -21,11 +21,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include QMK_KEYBOARD_H
+
 #include "action_layer.h"
 #include "process_tap_dance.h"
 #include "quantum.h"
-
-#include QMK_KEYBOARD_H
 
 #ifdef RAW_ENABLE
 #    include "raw_hid.h"
@@ -341,7 +341,7 @@ tap_dance_action_t tap_dance_actions[] = {
     /* [CT_CLN] = ACTION_TAP_DANCE_TAP_HOLD(KC_COLN, KC_SCLN), */
     [TD_TL3] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tl3_finished, td_tl3_reset, KC_SPC),
     /* [TD_TL2] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tl2_finished, td_tl2_reset, RCTL(KC_BSPC)), */
-    [TD_TL2] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tl2_finished, td_tl2_reset, KC_TAB),
+    [TD_TL2] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tl2_finished, td_tl2_reset, KC_BSPC),
     [TD_TR2] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tr2_finished, td_tr2_reset, KC_ESC),
     [TD_TR3] = ACTION_TAP_DANCE_FN_ADVANCED_NYX(NULL, td_tr3_finished, td_tr3_reset, KC_SPC),
 };
@@ -674,7 +674,7 @@ bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
         // Keycodes that continue Caps Word, with shift applied.
         case KC_A ... KC_Z:
-        case KC_MINS:
+            /* case KC_MINS: */
             add_weak_mods(MOD_BIT(KC_LSFT)); // Apply shift to next key.
             return true;
 
@@ -687,6 +687,7 @@ bool caps_word_press_user(uint16_t keycode) {
         case QK_TAP_DANCE | TD_TR2:
             return true;
 
+        // anything else deactivates caps word
         default:
             return false; // Deactivate Caps Word.
     }
@@ -727,7 +728,6 @@ const key_override_t *key_overrides[] = {
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_180;
 }
-
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         /* // QMK Logo and version information */
@@ -742,6 +742,7 @@ bool oled_task_user(void) {
 
         // Host Keyboard Layer Status
         int layer_number = get_highest_layer(layer_state | default_layer_state);
+
         oled_write_P(PSTR("Layer: "), false);
         switch (layer_number) {
             /* case _DEFAULT_QWERTY: */
@@ -815,6 +816,9 @@ bool oled_task_user(void) {
         oled_write_P(led_usb_state.caps_lock ? PSTR("CAP ") : PSTR("    "), false);
         oled_write_P(led_usb_state.scroll_lock ? PSTR("SCR ") : PSTR("    "), false);
     } else {
+        // our left oled seems to be dead
+        // in any case if you have to test it, make sure to flash left side as well
+
         // clang-format off
         static const char PROGMEM kyria_logo[] = {
             0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,128,128,192,224,240,112,120, 56, 60, 28, 30, 14, 14, 14,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7, 14, 14, 14, 30, 28, 60, 56,120,112,240,224,192,128,128,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -870,7 +874,7 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
  */
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [0] = LAYOUT_split_3x6_5(KC_ESC, KC_Q, KC_W, KC_F, KC_P, KC_G, KC_J, KC_L, KC_U, KC_Y, KC_MINS, KC_BSPC, CW_TOGG, LALT_T(KC_A), LGUI_T(KC_R), LSFT_T(KC_S), LCTL_T(KC_T), KC_D, KC_H, RCTL_T(KC_N), RSFT_T(KC_E), RGUI_T(KC_I), RALT_T(KC_O), KC_QUOT, TO(7), KC_Z, KC_X, KC_C, KC_V, KC_B, KC_DEL, KC_ENT, TO(12), TO(9), KC_K, KC_M, KC_COMM, KC_DOT, KC_SLSH, TO(7), KC_APP, OSL(10), TD(TD_TL3), TD(TD_TL2), KC_NO, KC_ENT, TD(TD_TR2), TD(TD_TR3), KC_RCTL, KC_NO),
+    [0] = LAYOUT_split_3x6_5(KC_ESC, KC_Q, KC_W, KC_F, KC_P, KC_G, KC_J, KC_L, KC_U, KC_Y, KC_MINS, KC_BSPC, CW_TOGG, LALT_T(KC_A), LGUI_T(KC_R), LSFT_T(KC_S), LCTL_T(KC_T), KC_D, KC_H, RCTL_T(KC_N), RSFT_T(KC_E), RGUI_T(KC_I), RALT_T(KC_O), KC_QUOT, TO(7), KC_Z, KC_X, KC_C, KC_V, KC_B, KC_DEL, KC_ENT, TO(12), TO(9), KC_K, KC_M, KC_COMM, KC_DOT, KC_SLSH, TO(7), KC_APP, OSL(10), TD(TD_TL3), TD(TD_TL2), KC_TAB, KC_ENT, TD(TD_TR2), TD(TD_TR3), KC_RCTL, KC_NO),
     [1] = LAYOUT_split_3x6_5(KC_TRNS, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_TRNS, KC_TRNS, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_TRNS, KC_TRNS, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
     [2] = LAYOUT_split_3x6_5(KC_TAB, KC_QUOT, KC_COMM, KC_DOT, KC_P, KC_Y, KC_F, KC_G, KC_C, KC_R, KC_L, KC_BSPC, LCTL_T(KC_ESC), KC_A, KC_O, KC_E, KC_U, KC_I, KC_D, KC_H, KC_T, KC_N, KC_S, RCTL_T(KC_MINS), KC_LSFT, KC_SCLN, KC_Q, KC_J, KC_K, KC_X, KC_LBRC, KC_CAPS, MO(5), KC_RBRC, KC_B, KC_M, KC_W, KC_V, KC_Z, KC_RSFT, MO(6), KC_LGUI, LALT_T(KC_ENT), KC_SPC, MO(3), MO(4), KC_SPC, KC_RALT, KC_RGUI, KC_APP),
     [3] = LAYOUT_split_3x6_5(KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_PGUP, KC_HOME, KC_UP, KC_END, KC_VOLU, KC_DEL, KC_TRNS, KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, KC_TRNS, KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, KC_VOLD, KC_INS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_SCRL, KC_TRNS, KC_TRNS, KC_PAUS, KC_MPRV, KC_MPLY, KC_MNXT, KC_MUTE, KC_PSCR, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
@@ -878,7 +882,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [5] = LAYOUT_split_3x6_5(KC_TRNS, KC_F9, KC_F10, KC_F11, KC_F12, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_F5, KC_F6, KC_F7, KC_F8, KC_TRNS, KC_TRNS, KC_RSFT, KC_RCTL, KC_LALT, KC_RGUI, KC_TRNS, KC_TRNS, KC_F1, KC_F2, KC_F3, KC_F4, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
     [6] = LAYOUT_split_3x6_5(KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_TRNS, KC_TRNS, RGB_TOG, RGB_SAI, RGB_HUI, RGB_VAI, RGB_MOD, KC_TRNS, TO(0), KC_TRNS, KC_TRNS, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, RGB_SAD, RGB_HUD, RGB_VAD, RGB_RMOD, TO(0), KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
     [7] = LAYOUT_split_3x6_5(KC_ESC, KC_Q, KC_W, KC_F, KC_P, KC_G, KC_J, KC_L, KC_U, KC_Y, KC_MINS, KC_BSPC, TG(13), KC_A, KC_R, KC_S, KC_T, KC_D, KC_H, KC_N, KC_E, KC_I, KC_O, TG(8), TO(0), KC_Z, KC_X, KC_C, KC_V, KC_B, KC_DEL, KC_ENT, OSL(10), OSL(9), KC_K, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_TRNS, KC_LALT, KC_LCTL, KC_SPC, KC_LSFT, KC_TAB, KC_ENT, KC_1, KC_2, KC_3, KC_4),
-    [8] = LAYOUT_split_3x6_5(KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_HOME, KC_UP, KC_PGUP, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LEFT, KC_DOWN, KC_RGHT, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_END, KC_TRNS, KC_PGDN, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
+    [8] = LAYOUT_split_3x6_5(KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_HOME, KC_UP, KC_PGUP, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LEFT, KC_DOWN, KC_RGHT, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_END, KC_DOWN, KC_PGDN, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
     [9] = LAYOUT_split_3x6_5(KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_7, KC_8, KC_9, KC_NO, KC_TRNS, KC_TRNS, LALT_T(KC_NO), LGUI_T(KC_PSLS), LSFT_T(KC_PAST), LCTL_T(KC_PEQL), KC_COLN, KC_0, KC_4, KC_5, KC_6, KC_0, KC_TRNS, KC_TRNS, KC_NO, KC_PMNS, KC_PPLS, KC_DOT, KC_COMM, KC_TRNS, TO(0), KC_TRNS, TO(14), KC_NO, KC_1, KC_2, KC_3, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, TO(0), KC_TRNS, KC_TRNS, KC_TRNS),
     [10] = LAYOUT_split_3x6_5(KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, TO(6), KC_PAUS, KC_F7, KC_F8, KC_F9, KC_F12, KC_TRNS, KC_TRNS, KC_LALT, KC_LGUI, KC_LSFT, KC_LCTL, KC_NO, KC_SCRL, KC_F4, KC_F5, KC_F6, KC_F11, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, TO(0), KC_TRNS, KC_TRNS, KC_PSCR, KC_F1, KC_F2, KC_F3, KC_F10, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, TO(0), KC_TRNS, KC_TRNS, KC_TRNS),
     [11] = LAYOUT_split_3x6_5(UC(0x00A3), KC_CIRC, KC_LT, KC_GT, KC_DLR, KC_AMPR, KC_SCLN, KC_COLN, KC_LBRC, KC_RBRC, KC_GRV, KC_TRNS, KC_TRNS, KC_EXLM, KC_SLSH, KC_ASTR, KC_EQL, KC_PIPE, KC_AT, KC_DQUO, KC_LPRN, KC_RPRN, KC_NO, KC_TRNS, KC_TRNS, KC_QUES, KC_MINS, KC_PLUS, KC_HASH, KC_TILD, KC_TRNS, TO(0), TO(0), KC_TRNS, KC_PERC, KC_UNDS, KC_LCBR, KC_RCBR, KC_BSLS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, TO(0), KC_TRNS, KC_TRNS, KC_TRNS),

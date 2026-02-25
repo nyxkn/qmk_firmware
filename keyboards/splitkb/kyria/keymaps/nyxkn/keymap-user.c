@@ -579,6 +579,7 @@ void td_tr3_reset(tap_dance_state_t *state, void *user_data) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     tap_dance_action_t *action;
+    tap_dance_state_t  *state;
 
 #ifdef CONSOLE_ENABLE
     uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
@@ -633,8 +634,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case TD(TD_TL2):
         case TD(TD_TR2):
         case TD(TD_TR3):
+            // somehow tap_dance_get doesn't exit? but docs use it
+            // action = tap_dance_get(QK_TAP_DANCE_GET_INDEX(keycode));
             action = &tap_dance_actions[TD_INDEX(keycode)];
-            if (!record->event.pressed && action->state.count && !action->state.finished) {
+            state  = tap_dance_get_state(QK_TAP_DANCE_GET_INDEX(keycode));
+
+            if (!record->event.pressed && state->count && !state->finished) {
                 td_user_data_t *td_user_data = (td_user_data_t *)action->user_data;
 
                 // !! these next two blocks are mutually exclusive
@@ -642,7 +647,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 // choose whether you want to end dance with tap
                 {
                     td_user_data->status = TD_SINGLE_TAP;
-                    reset_tap_dance(&(action->state));
+                    /* reset_tap_dance(&(action->state)); */
+                    reset_tap_dance(state);
                 }
 
                 // or if you want to take repeating into account
